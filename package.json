@@ -2,7 +2,7 @@
 	"name": "memoize-pure-function",
 	"version": "0.0.0",
 	"packageManager": "pnpm@10.14.0",
-	"description": "Memoize pure functions with infinite cache size and automatic memory management",
+	"description": "Memoize pure functions with referential equality",
 	"type": "module",
 	"license": "MIT",
 	"homepage": "https://github.com/ianduvall/memoize-pure-function#readme",

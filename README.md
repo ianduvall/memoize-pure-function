@@ -10,75 +10,32 @@ A TypeScript library for memoizing pure functions with infinite cache size and a
 pnpm add memoize-pure-function
 ```
 
-## How It Works
-
-The memoization implementation:
-
-- Uses weak references to prevent memory leaks
-- Supports any number of arguments of any type
-- Preserves exact function signatures and return types
-- Uses argument identity (reference equality) for non-primitive values
-- Handles `null`, `undefined`, and other primitive values correctly
-
 ## Important Notes
 
-- **Pure Functions Only**: This library is designed for pure functions (functions that always return the same output for the same input and have no side effects)
+- **Pure Functions Only**: This library is designed for pure functions (i.e. functions that always return the same output given the same input and have no side effects)
 - **Reference Equality**: Non-primitive values are compared by reference
 - **Memory Management**: Uses WeakMap internally to allow garbage collection of unused cache entries
 
 ## Usage Examples
 
-### Functions with Object Arguments
+### React Hooks
+
+Alternative to React's `useMemo` hook, `memoizePureFunction` can be used to share memoization across usages of a hook. This is useful for hooks that need to do some expensive computation but need to be called in many places.
 
 ```ts
-interface User {
-	id: number;
-	name: string;
-}
+const calculateSomethingExpensive = memoizePureFunction(
+	function expensiveComputation(user) {},
+);
+const useExpensiveUserProperty = () => {
+	const user = useUser();
 
-const getUserData = (user: User) => ({
-	...user,
-	displayName: user.name.toUpperCase(),
-});
-
-const memoizedGetUserData = memoizePureFunction(getUserData);
-
-const user1 = { id: 1, name: "Alice" };
-const user2 = { id: 1, name: "Alice" };
-
-memoizedGetUserData(user1); // Calculated
-memoizedGetUserData(user1); // Cached (same object reference)
-memoizedGetUserData(user2); // Calculated (different object reference)
+	return calculateSomethingExpensive(user);
+};
 ```
 
-### Functions with Array Arguments
+This can be more ergonomic than alternative solutions to this problem, like hoisting into a context provider, because it maintains the lazy, pull-based sematics of `useMemo`.
 
-```ts
-const sumArray = (numbers: number[]) => numbers.reduce((sum, n) => sum + n, 0);
-
-const memoizedSum = memoizePureFunction(sumArray);
-
-const arr1 = [1, 2, 3];
-const arr2 = [1, 2, 3];
-
-memoizedSum(arr1); // Calculated
-memoizedSum(arr1); // Cached (same array reference)
-memoizedSum(arr2); // Calculated (different array reference)
-```
-
-### Functions with Many Arguments
-
-```ts
-const calculateScore = (...factors: number[]) =>
-	factors.reduce((product, factor) => product * factor, 1);
-
-const memoizedCalculateScore = memoizePureFunction(calculateScore);
-
-memoizedCalculateScore(1, 2, 3, 4, 5); // Calculated
-memoizedCalculateScore(1, 2, 3, 4, 5); // Cached
-```
-
-### Type Safety
+## Type Safety
 
 The memoized function preserves the exact type signature of the original function:
 
